@@ -1,0 +1,27 @@
+<!doctype html>
+
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>How to Learn JavaScript</title>
+  <meta name="description" content="How to Learn JavaScript">
+  <meta name="author" content="Tomomi Suzuki">
+  <link rel="stylesheet" href="css/styles.css">
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.js"></script>
+
+</head>
+
+<body>
+
+  <button>Click</button>
+  <div id="message" style="display: none;">This is message</div>
+
+  <script>
+    $('button').click((event) => {
+      $('#message').slideToggle()
+    })
+  </script>
+
+</body>
+</html>
