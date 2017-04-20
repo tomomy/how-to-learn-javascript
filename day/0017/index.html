@@ -1,0 +1,147 @@
+<!doctype html>
+
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>How to Learn JavaScript</title>
+  <meta name="description" content="How to Learn JavaScript">
+  <meta name="author" content="Tomomi Suzuki">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.js"></script>
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/semantic-ui/2.2.7/semantic.min.css">
+  <script src="https://cdn.jsdelivr.net/semantic-ui/2.2.7/semantic.min.js"></script>
+  <title>Typing Game!</title>
+  <style>
+    body {
+      padding-top: 40px;
+      font-family: 'Courier New', sans-serif;
+      text-align: center;
+    }
+    #target {
+      font-size: 48px;
+      letter-spacing: 3px;
+    }
+    .info {
+      color: #ccc;
+    }
+  </style>
+
+</head>
+
+<body>
+  <p id="target"></p>
+  <p class="info">
+    Letters count: <span id="score"></span>,
+    Miss count: <span id="miss"></span>,
+    Remaining Time: <span id="timer"></span>
+  </p>
+
+  <script>
+  $(function (){
+
+    var words = [
+    'apple',
+    'imagine',
+    'supply',
+    'fun',
+    'happy',
+    'air',
+    'sky',
+    ];
+    var currentWord;//何文字目を打っているのかを「currentLocation」で管理しておきましょう。
+    var currentLocation;
+    var score;
+    var miss;
+    var timer;
+    var target = document.getElementById('target');
+    var scoreLabel = document.getElementById('score');
+    var missLabel = document.getElementById('miss');
+    var timerLabel = document.getElementById('timer');
+
+    var isStarted;//ゲームが始まっているかどうか
+    var timerID;//タイマーを止めるときのID
+
+    function init() {
+      currentWord = 'click to start';
+      currentLocation = 0;
+      score = 0;
+      miss = 0;
+      timer = 10;
+      target.innerHTML = currentWord;//target の方には 'apple' を表示させたいので currentWord を入れてあげます。
+      scoreLabel.innerHTML = score;
+      missLabel.innerHTML = miss;
+      timerLabel.innerHTML = timer;
+      isStarted = false;//最初はfalse;
+    }
+
+    init();
+
+    //1秒ごとにタイマーをどんどん減らしていく
+    function updateTimer() {
+      timerId = setTimeout(function() {
+        timer--;//timerを１減らし、timerLabelにその値を入れる
+        timerLabel.innerHTML = timer;
+        if (timer <= 0) {
+          //alert('game over');
+          var accuracy = (score + miss) === 0 ? '0.00' : ((score / (score + miss)) * 100).toFixed(2);//0 除算をしたくないので、もし「score + miss === 0」だった場合には、単に 0.00 と表示してあげて、そうではない場合はちゃんと計算してあげたいので、scoreをscore+missで割りつつ、それに100を掛けてあげて、小数点2桁までとしてあげれば OK
+          alert(score + 'letters,' + miss + 'miss!' + accuracy + '% accuracy');//こちらを表示してあげたいので、まず score を表示した後に miss を表示してあげて、そして最後にどれだけ正確だったかを表示してあげれば OK かと思います。
+
+          clearTimeout(timerId);
+          init();//ゲームオーバー時に初期化にする
+          return;//その場で処理を止める
+        }
+        updateTimer();//updateTimerを呼ぶ
+      }, 1000);
+
+    }
+
+    function setTarget () {
+      currentWord = words[Math.floor(Math.random() * words.length)];//setTarget() の中では currentWordをこちらの配列の中からランダムに選んだものにしたいので
+      target.innerHTML = currentWord;
+      currentLocation = 0;//リセットする
+    }
+
+    window.addEventListener('click', function(e){
+      if (!isStarted) {
+        isStarted = true;//trueのときはsetTargetしては駄目
+        setTarget();
+        updateTimer();//ゲームが始まった時に呼ぶ
+      }
+    });
+
+    //では次に押したキーが何だったか、というのを判定してみましょう。window に対してイベントを割り当てていけば OK.取得したキーはこちらの関数にeという引数を与えてあげると、押したキーの keyCode を e.keyCode で取得することができるので、それで見ていきましょう。
+    window.addEventListener('keyup', function(e){
+      //e.keyCodeから文字を判定して表示していきたいので String の fromCharCode を使っていきましょう。
+      //console.log(String.fromCharCode(e.keyCode));
+      if(!isStarted) {
+        return;
+      }
+      if (String.fromCharCode(e.keyCode) === currentWord[currentLocation].toUpperCase()) {
+          currentLocation++;//正解した場合は次の文字にいきたいので currentLocation を増やしていってあげましょう。不正解の場合はもう 1 回打たせたいので currentLocation はそのままにしたいと思います。
+        //console.log('score!');
+          var placeholder = '';
+          for (var i = 0; i < currentLocation; i++) {
+            placeholder += '_';//まずは…、'_' の文字列を初期化してあげてループを回していきましょう。0 番目から currentLocationの手前までループを回しつつ、そのループの回数分だけ placeholder に '_' を入れていってあげたいと思います。
+          }
+          target.innerHTML = placeholder + currentWord.substring(currentLocation);//正解した文字数分の '_'ができるかと思うのでtarget.innerHTMLにplaceholder と…、あとは正解した文字数分の '_' を抜いた残りの部分をつけてあげればいいのでcurrentWord.substring(currentLocation) とすると、currentLocationから最後までの文字をくっつけてくれるかと思います。
+        score++;
+        scoreLabel.innerHTML = score;
+        if (currentLocation === currentWord.length) {
+          setTarget();
+        }
+      } else {
+        //console.log('miss!');
+        miss++;
+        missLabel.innerHTML = miss;
+      }//こちらの文字が currentWord の currentLocation 番目の文字の大文字と一致すればいいので .toUpperCase() を使ってあげましょう。
+
+    });
+
+
+
+  });
+
+  </script>
+
+</body>
+</html>

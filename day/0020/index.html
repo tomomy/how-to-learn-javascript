@@ -1,0 +1,220 @@
+<!doctype html>
+
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>How to Learn JavaScript</title>
+  <meta name="description" content="How to Learn JavaScript">
+  <meta name="author" content="Tomomi Suzuki">
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/semantic-ui/2.2.7/semantic.min.css">
+  <script src="https://cdn.jsdelivr.net/semantic-ui/2.2.7/semantic.min.js"></script>
+  <title>15 Puzzle!</title>
+
+
+</head>
+
+<body>
+  <canvas id="stage" width="280" height="280">
+    Canvas not supported...
+  </canvas>
+
+
+
+  <script>
+    $(function(){
+      var canvas = document.getElementById('stage');
+      var context;
+      var image;
+      var IMAGE_URL = '15puzzle.png';
+      //tiles[0][0] = 0;
+      //tiles[0][1] = 1;
+      //tiles[0][2] = 2;
+      //tiles[0][3] = 3;
+      //tiles[1][0] = 4;
+      //...今回のパズルなのですが、こちらの 4x4 のマスを tiles という配列の配列で管理しつつ、その中に数値を入れてそれぞれのタイルの数値を管理していく、といった形にしてみたいと思います。具体的にどういう配列の配列になるかというと、tiles の 0 行目 0 列目が 0、そして 0 行目 の 1 列目、2 列目、3 列目が最初の初期値だと 1、2、3 となっていて、1 行目の 0 列目が 4 といった具合に作っていきたいと思います。
+      var tiles = [];
+      var ROW_COUNT = 4;
+      var COL_COUNT = 4;
+      var PIC_WIDTH = 280;
+      var PIC_HEIGHT = 280;
+      var TILE_WIDTH = PIC_WIDTH / COL_COUNT;
+      var TILE_HEIGHT = PIC_HEIGHT / ROW_COUNT;
+      //TILE_HEIGHT と TILE_WIDTH なのですが、70 と書いても良いのですが、後で画像の分割数を変えたいこともあるかと思うので、画像の幅と高さをこちらの ROW_COUNT などで割って計算するようにしてあげましょう。
+
+      var UDLR = [
+       [0, -1],
+       [0, 1],
+       [-1, 0],
+       [1, 0],
+      ];
+      //ではこちらの row と col から tiles の値を引っ張ってきて、空白だったら何もしない、空白ではなかったら、その上下左右を調べて、もし空白だったらそちらに移動させる、と書いていきましょう。どうするかなのですが…、上下左右を調べるときに row と col にそれぞれ足していく値を配列の配列で持っておくと何かと便利なので、それを作っていきましょう。Up、Down、Left、Right という意味で、UDLR という配列を作っていきたいと思います。Up の場合は…、X 方向には 0、Y 方向には -1 を足してあげれば OK ですね。Down の場合には（Y 方向を）1 にしてあげて、Left の場合は [-1, 0]、そして Right の場合は [1,0] としてあげれば OK でしょう。
+
+      var moveCount = 32;
+
+
+      ////row と col は当然の事ながら全てに対してやらなくてはいけないので、二重ループを回していけば OK かと思います。
+      function initTiles() {
+        var row, col;
+        for (row = 0; row < ROW_COUNT; row++) {
+          tiles[row] = [];
+          for (col = 0; col < COL_COUNT; col++) {
+            tiles[row][col] = row * COL_COUNT + col;
+        }
+        }
+        //console.log(tiles);
+        //15 パズルなのですが、最初は右下を空白にしたいので、その辺りをやっていきましょう。なので tiles[ROW_COUNT - 1][COL_COUNT - 1]とすると右下の値になるので、今回は-1という特殊な値にしてあげましょう。
+        tiles[ROW_COUNT - 1][COL_COUNT - 1] = -1;
+      }
+
+
+      function drawPuzzle() {
+        var row, col; //= 2;
+        // var col = 1;
+        //tiles[row][col] = 6;
+        var sx, sy;
+        var dx, dy;
+
+        //その場合なのですが、まず width と height は今回、高さと幅を 70 にしているので、このように表現してあげれば OK でしょう。
+        /*var w = 70;
+        var h = 70;*/
+
+        for (row = 0; row < ROW_COUNT; row++) {
+          for (col = 0; col < COL_COUNT; col++) {
+
+        //sx と sy ですが source なので…、こちらの値を使って、ここ（3 行目 2 列目の左上）の座標を出さないといけません。どうするかなのですが、まず sx に関しては 6 の値を COL_COUNT で割った余りで「列」が出るので、それに対して width を掛けてあげれば OK でしょう。destinationは、こちらのx、y座標を計算してあげればok. rowとcolで表現ができ、dxはx方向なので、colに対してw(idth)を掛けてあげればOK. dyはrowに対してh(eight)を掛けてあげれば、座標が出る。
+        dx = col * TILE_WIDTH;
+        dy = row * TILE_HEIGHT;
+
+        //-1 の場合は切り出して表示するのではなくて、単に塗りつぶせば良いので、その辺りの処理をやっていきます。どうするかというと…、tiles[row][col] が -1 だった場合…、単に塗りつぶして、そうでない場合は今まで通りにしてあげれば OK です。
+        if (tiles[row][col] === -1) {
+          context.fillStyle = '#eeeeee';
+          context.fillRect(dx, dy, TILE_WIDTH, TILE_HEIGHT);
+        } else {
+          sx = (tiles[row][col] % COL_COUNT) * TILE_WIDTH;
+          sy = Math.floor((tiles[row][col] / ROW_COUNT)) * TILE_HEIGHT;
+
+          context.drawImage(image, sx, sy, TILE_WIDTH, TILE_HEIGHT, dx, dy, TILE_WIDTH, TILE_HEIGHT);
+        }
+
+
+        //具体的にはどうなるかというと…、こちらに対して余りを求めたいので、このようにしてあげて、さらに width を掛けてあげれば OK かと思います。同じように sy に関しては…、こちらの値を ROW_COUNT で割ってあげて、それの小数点以下切り捨てをすると「行」が出てくるので、それに対して height を掛けてあげれば OK かと思います。
+        /*sx = (tiles[row][col] % COL_COUNT) * TILE_WIDTH;
+        sy = Math.floor((tiles[row][col] / ROW_COUNT)) * TILE_HEIGHT;
+
+        context.drawImage(image, sx, sy, TILE_WIDTH, TILE_HEIGHT, dx, dy, TILE_WIDTH, TILE_HEIGHT);*///今 tiles には 0 から順番に数字が入っているので単純なのですが、後でユーザーがタイルを動かして、例えばこちらの 2 行目の 1 列目に 6 が入ったとしましょう。その場合は変数で管理しておくと…、2 行目の 1 列目に 6 が入ったというのは、こういった状態ですね。その場合は…、こちらの 2 行目の 1 列目に元画像の、この 6 の画像を切り出して、描画しないといけません。具体的に Canvas の命令で言うと context.drawImage(image, … ) とした後に、元画像の x、y 座標から、width と height 分だけ切り出して、配置先の x、y 座標に width と height の大きさで配置すれば OK という形になりますちなみに元画像は source と呼ばれるので、こちらを sx、sy、配置先は destination と呼ばれるので、こちらを dx、dy としておくと分かりやすいでしょう。
+        // context.drawImage(image, 0, 0);
+          }
+        }
+      }
+
+      //この辺りでループを回していきましょう。どうするかなのですが…、1 つずつ調べていって、本来あるべき数字とずれていたら、false を返してあげれば OK ですね。…なので tiles[row][col] が左上から 0、1、2 …と並んでいるかどうかは、最初の initTiles() のところでやりましたが、「row * COL_COUNT + col」という表現で可能ですね。もしそうだった場合には「return false;」としてあげれば良いでしょう。そうではなくて右下までいってしまった場合は全部並んでいたということなので、「右下まで行ったよ」という表現を書いてあげれば OK でしょう。
+      function checkResult() {
+        var row, col;
+        for (row = 0; row < ROW_COUNT; row++) {
+          for (col = 0; col < COL_COUNT; col++) {
+            if (row === ROW_COUNT - 1 && col === COL_COUNT - 1) {
+              return true;
+            }
+            if (tiles[row][col] !== row* COL_COUNT + col) {
+              return false;
+            }
+          }
+        }
+      }
+
+      function moveBlank(count) {
+        var blankRow, blankCol;
+        var targetPosition;
+        var targetRow, targetCol;
+
+        blankRow = ROW_COUNT - 1;
+        blankCol = COL_COUNT - 1;
+
+        //さて、こちらの処理ですが…、当然 count がなくなるまでやらなくてはいけませんが、その辺りのループ処理を書き忘れていたので、書いておきましょう。while(true) でループを回しつつ、終了条件を指定する、と書いてあげましょう。終了条件は当然のことながら count を 1 ずつ減らしつつ、0 になったら break する、とすれば OK. targetRow と targetCol を使って入れ替えをやりたいのですが、まずは target が盤の外だったら次のループにいくとしたいので、その辺りを先に書いていきましょう。continue; として、次のループに飛ぶようにしてあげましょう。そこまでできたら入れ替えをしたいのですが、当然 blankRow の値を targetRow、 blankCol の値を tiles の targetCol にしてあげれば良いので、このような書き方になるかと思います。そこまでできたら、こちらの tiles の target のほうは空白になるので -1 にしてあげましょう。blankRow と targetRow はこのように更新してあげないといけないので、こうしてあげれば OK かと思います。
+
+        while(true) {
+          targetPosition = Math.floor(Math.random() * UDLR.length);
+          targetRow = blankRow + UDLR[targetPosition][1];
+          targetCol = blankCol + UDLR[targetPosition][0];
+          if (targetRow < 0 || targetRow >= ROW_COUNT) {
+            continue;
+          }
+          if (targetCol < 0 || targetCol >= COL_COUNT) {
+            continue;
+          }
+          tiles[blankRow][blankCol] = tiles[targetRow][targetCol];
+          tiles[targetRow][targetCol] = -1;
+          blankRow = targetRow;
+          blankCol = targetCol;
+          if (!--count) {
+            break;
+          }
+
+        }
+      }//まずどうするかというと…、空白のところの行と列を保持しておきたいので、var blankRow, blankCol; としてあげて、最初は当然右下なので、ROW_CONT - 1、そして blankCol に関しては COL_COUNT - 1 としてあげれば OK でしょう。どちらに動かすかはランダムに選んでいってあげたいので、targetPosition で上下左右をランダムに選ぶことにしましょう。target となる位置の row と col は、targetRow、targetCol で管理しておきたいと思います。targetPosition ですが、ランダムで選んでいきたいので Math.floor(Math.random() … を使っていってあげましょう。今回も上下左右の話なので、UDLR を使っていきたいと思います。こうしてあげると UDLR のどれかを選んでくれるので、そちらの値を targetRow などに反映させれば OK でしょう。では blankRow と UDLR[targetPosition] の…、targetRow の場合は Y 方向なので 1 番目を出してあげれば OK かと思います。
+
+      // if(!canvas.getContext){
+      //   alert('Canvas not supported...');
+      //   return;
+      // }
+      context = canvas.getContext('2d');
+
+      image = document.createElement('img');
+      image.src = IMAGE_URL;
+      image.addEventListener('load', function() {
+        initTiles();
+        moveBlank(moveCount);
+        drawPuzzle();
+      });
+
+      //何をしたいかというと、クリックされた箇所の座標から行と列を割り出してあげて、tiles の値を取得してあげれば OK ですね。tiles の値が -1、つまり空白の場合は何もしなくて良いのですが、そうでない場合は、周りに空白があるか調べて、あったらそちらに移動してあげるという処理を書かないといけません。なので、まずはクリックされた箇所の x y 座標を取得してみましょう。こちらの関数に e という値を渡してあげると、こちらで event オブジェクトが取れるので、x 座標は e.clientX、そして y は e.clientY で取得することができます。
+      canvas.addEventListener('click', function(e) {
+        var x, y;
+        var rect;
+        var row, col;
+        var i;
+        var targetRow, targetCol;
+
+        rect = e.target.getBoundingClientRect();
+        x = e.clientX - rect.left;
+        y = e.clientY - rect.top;
+        row = Math.floor(y / TILE_HEIGHT);
+        col = Math.floor(x / TILE_WIDTH);
+        if (tiles[row][col] === -1) {
+          return;
+        }//ただし、こちらで取得しているのは、ブラウザの左上を基点としてしまっているので、canvasの左上を基点にするために offset 分を引いてあげる必要があります。どうするかというと…、canvasの領域を取得してあげて、左上の座標を引いてあげれば OK ですね。どのように取れるかというと「rect = e.target.getBoundingClientRect();」で領域が取れるので、そちらの左上の座標をこのように引いてあげれば OK です。ここから行と列を割り出していきたいのですが、まず行に関しては、y 方向の話なので、y を TILE_HEIGHTで割ってあげた時に小数点切り捨てをすれば良いので、これでOK。どうしたいかというと、まずtiles[row][col]が-1だったら何もしない、としてあげればOK
+
+        //console.log(row, col);
+
+        //あとはこの配列分だけループを回して調べていけば OK ですね。i は当然宣言しないといけないので、「var i;」としてあげましょう。今どこの row と col を調べているかを targetRow、targetCol で保持しておくとわかりやすいかと思います。ではどうするかというと…、targetRow に関しては、row に対して UDLR[i][1] を足してあげれば OK かと思います。Col に関しては UDLR[i][0] を足してあげると、 X 方向のずれを足してあげることができるかと思います。当然こちらの盤から外れてしまったものについては調べる必要がないので、例えばこちらで調べたときは下を調べる必要はありません。
+        for (i = 0; i < UDLR.length; i++) {
+           targetRow = row + UDLR[i][1];
+           targetCol = col + UDLR[i][0];
+           if (targetRow < 0 || targetRow >= ROW_COUNT) {
+            continue;
+          }
+            if (targetCol < 0 || targetCol >= COL_COUNT) {
+            continue;
+           }
+
+           //そして実際に空白が見つかった場合の処理を書いていきましょう。tiles[targetRow][targetCol] が空白だった場合、つまり -1 だった場合…と書くことができるので、その場合は target の位置にあるものを tiles[row][col] としてあげて、「tiles[row][col] = -1;」としてあげれば OK ですね。これで入れ替わったかと思うので、drawPuzzle() で再描画をしてあげて、それ以上ループを回す必要はないので、「break;」としてあげましょう
+           if (tiles[targetRow][targetCol] === -1) {
+            tiles[targetRow][targetCol] = tiles[row][col];
+            tiles[row][col] = -1;
+            drawPuzzle();
+            if (checkResult()) {
+              alert('Game Clear');
+            }
+            break;
+           }
+        }
+
+      });
+    });
+
+  </script>
+
+</body>
+</html>

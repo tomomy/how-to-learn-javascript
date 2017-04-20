@@ -1,0 +1,195 @@
+<!doctype html>
+
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>How to Learn JavaScript</title>
+  <meta name="description" content="How to Learn JavaScript">
+  <meta name="author" content="Tomomi Suzuki">
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.js"></script>
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/semantic-ui/2.2.7/semantic.min.css">
+  <script src="https://cdn.jsdelivr.net/semantic-ui/2.2.7/semantic.min.js"></script>
+  <title>SLOT MACHINE</title>
+  <style>
+  body {
+    background: #e0e0e0;
+    font-family: Arial, sans-serif;
+    text-align: center;
+    font-size: 16px;
+    margin-top: 30px
+  }
+  .panel {
+    display: inline-block;
+    width: 60px;
+    padding: 7px;
+    border-radius: 5px;
+    margin-bottom: 15px;
+    color: #00aaff;
+    font-weight: bold;
+    font-size: 32px;
+    line-height: 64px;
+    background: #fff;
+  }
+  .panel + .panel {
+    margin-left: 10px;
+  }
+  .panel.unmatched {
+    opacity: 0.5;
+  }
+    .btn {
+    display: inline-block;
+    width: 60px;
+    padding: 7px;
+    border-radius: 5px;
+    margin-bottom: 15px;
+    color: #fff;
+    box-shadow: 0 4px 0 #0088cc;
+    background: #00aaff;
+    cursor: pointer;
+  }
+  .btn + .btn {
+    margin-left: 10px;
+  }
+  .btn.inactive {
+    opacity: 0.5;
+  }
+
+  #spinButton  {
+    margin: 0 auto;
+    width: 240px;
+    padding: 7px;
+    border-radius: 5px;
+    color: #fff;
+    box-shadow: 0 4px 0 #e91b0c;
+    background: #f44336;
+    cursor: pointer;
+  }
+  #spinButton.inactive {
+    opacity: 0.5;
+  }
+
+  </style>
+</head>
+
+<body>
+<div>
+<div class="panel" id="panel0">?</div>
+<div class="panel" id="panel1">?</div>
+<div class="panel" id="panel2">?</div>
+</div>
+
+<div>
+    <div class="btn inactive" id="btn0">STOP</div>
+    <div class="btn inactive" id="btn1">STOP</div>
+    <div class="btn inactive" id="btn2">STOP</div>
+</div>
+<div id="spinButton">SPIN</div>
+
+</body>
+<script>
+    $(function(){
+      var panels = ['◯', '△', '☆'];
+      var timers = [];//setTimeout を使っていきたいのですが、setTimeout を実行する時に timer idを保持しておきたいので、そのための配列も用意しておきましょう。
+      var results = [];
+      var stopCount = 0;
+      var isPlaying = false;
+      //今スロットが回っているかどうかというのを変数で管理してあげて、その値に応じて色々な処理を振り分けていきましょう。
+
+      var panel0 = document.getElementById('panel0');//プログラムで後から使いやすいようにまずは取得
+      var panel0 = document.getElementById('panel0');
+      var panel1 = document.getElementById('panel1');
+      var panel2 = document.getElementById('panel2');
+      var btn0 = document.getElementById('btn0');
+      var btn1 = document.getElementById('btn1');
+      var spinButton = document.getElementById('spinButton');
+
+      spinButton.addEventListener('click', function(){
+        if(isPlaying)return;
+　　　　　isPlaying = true;
+        //最初はプレイをしていないので「var isPlaying = false;」としてあげて、SPIN ボタンを押した時にもうすでに Playing だったらこのあとの処理をしたくないので、return としてあげて、こちらで処理を止めてあげましょう。
+
+        this.className = 'inactive';
+        btn0.className = 'btn';
+        btn1.className = 'btn';
+        btn2.className = 'btn';
+        //SPINボタンを押した時にSTOPボタンを有効化されるようにする。最初は無効化→SPIN押下後、SPINは押せないようにし、STOP0のみ押せるようにする。
+        panel0.className = 'panel'
+        //SPINボタンを押した時に、unmachedを外せば良いので「panel0.className = 'panel';」とすれば OK ですね。
+        panel1.className = 'panel'
+        panel2.className = 'panel'
+
+        runSlot(0, panel0);
+        runSlot(1, panel1);
+        runSlot(2, panel2);
+      });//スロットが 3 つあるので何番目のスロットの、どのパネルに対して処理をするかというのを書いていきたいと思います。
+
+      function runSlot(n, panel) {
+        panel.innerHTML = panels[Math.floor(Math.random() * panels.length)];//引数は n 番目のスロットで panel が渡ってくるとしてあげて、まず何をするかというと panelの中身を先ほど作ったpanelsの中の何かで更新してあげれば OK. 乱数を使ってあげて「panel.innerHTML = panels[Math.floor(Math.random() * panels.length)];」のように書く。panels.length を使ってあげることによって、配列の要素を増やしてもこのコードのままで実行できるのでこうしておきます。
+        timers[n] = setTimeout(function(){
+          runSlot(n, panel)
+
+        }, 50);//「var timers=[];」としてあげたあとに、「timers[n] = setTimeout(function() {};}」としてあげます。
+        //実際の処理ですが、再帰的に呼び出していけば良いので「runSlot(n, panel)」を呼び出してあげれば OK 間隔は、50mm秒ごと
+
+      }
+      btn0.addEventListener('click', function(){
+        stopSlot(0, panel0, this);//panelの中身をresultsに入れたいので panel0を渡し、あとはボタンを押せないようにしたいのでbtn0を渡したいのですがthisで表現できるので「stopSlot(0, panel0, this);」で OK
+      });
+      btn1.addEventListener('click', function(){
+        stopSlot(1, panel1, this);
+      });
+      btn2.addEventListener('click', function(){
+        stopSlot(2, panel2, this);
+      });
+      function stopSlot(n, panel, btn) {
+        if(!isPlaying || results[n])return;
+        //STOP ボタンなのですが、もしスロットが回っていないか、このスロットにすでに値が入っていたら別に何の処理もしたくないので「if (!isPlaying || results[n] !== undefined) return;」としてあげれば OK なのではないでしょうか。
+
+        btn.className = 'btn inactive';
+        clearTimeout(timers[n]);
+        results[n] = panel.innerHTML;
+        stopCount++;
+
+        if(stopCount === 3) {
+          //check
+          checkResults();
+          //init リプレイができるように stopCount が 3 になって check したあとに色々な初期化をしていきましょう。timers を初期化してあげて、resultsもリセットしてあげて、 stopCount も元に戻してあげましょう。spinButton を押せる風にしたいので「spinButton.className = '';」とすれば OK
+
+          isPlaying = false;//isPlaying は初期化の時に戻してあげないといけないので「isPlaying = false;」とすれば OK かな。
+
+          timers = [];
+          results = [];
+          stopCount = 0;
+          spinButton.className = '';
+
+        }
+
+      }//n 番目のスロットで panel と btn が渡された、としてあげます。それから、タイマーを止める。results に今表示されている panel の中身を入れたいので innerHTML を入れれば OK
+      //varstopCount=0;」としてあげて、ストップボタンを押すたびに stopCount を 1 ずつ増やしてあげて、stopCount が 3 の場合に結果をチェックするよ、としてあげましょう。
+      //スタイルを作っておきたいので、パネルのスタイルに .panel.unmatched を作ってあげて、opacity を操作してあげましょう。
+
+      function checkResults() {
+        if (results[0] !== results[1] && results[0] !== results[2]){
+          panel0.className = 'panel unmatched';
+        }
+        if (results[1] !== results[0] && results[1] !== results[2]){
+          panel1.className = 'panel unmatched';
+        }
+        if (results[2] !== results[1] && results[2] !== results[0]){
+          panel2.className = 'panel unmatched';
+        }
+
+
+      }
+
+
+    });
+
+
+
+</script>
+
+</body>
+</html>

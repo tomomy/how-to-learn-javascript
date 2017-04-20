@@ -1,0 +1,102 @@
+<!doctype html>
+
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>How to Learn JavaScript</title>
+  <meta name="description" content="How to Learn JavaScript">
+  <meta name="author" content="Tomomi Suzuki">
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.js"></script>
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/semantic-ui/2.2.7/semantic.min.css">
+  <script src="https://cdn.jsdelivr.net/semantic-ui/2.2.7/semantic.min.js"></script>
+  <title>Comment Form</title>
+  <style>
+    body {
+      font-family: Verdana, sans-serif;
+      font-size: 16px;
+      background: #e0e0e0;
+    }
+    .container {
+      width: 400px;
+      margin: 30px auto;
+    }
+    textarea {
+      width: 400px;
+      box-sizing: border-box;
+      height: 200px;
+      padding: 14px;
+      font-size: 16px;
+      border: none;
+      border-radius: 5px;
+      margin-bottom: 14px;
+      line-height: 1.5;
+    }
+    textarea:focus {
+      outline: none;
+    }
+    p {
+      color: #333;
+      font-size: 14px;
+      margin: 0;
+      padding-top: 8px;
+    }
+    #label {
+      font-weight: bold;
+    }
+    .btn {
+      display: inline-block;
+      width: 150px;
+      background: #00aaff;
+      padding: 5px;
+      color: #fff;
+      border-radius: 5px;
+      text-align:center;
+      cursor: pointer;
+      box-shadow: 0 4px 0 #0088cc;
+      float: right;
+    }
+    .warning {
+      color: red;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <textarea id="comment" placeholder="your comment here"></textarea>
+    <div class="btn">Submit</div>
+    <p><span id="label"></span> characters left</p>
+</div>
+
+<script>
+    $(function(){
+      var comment = document.getElementById('comment');
+      var label = document.getElementById('label');
+
+      var LIMIT = 30;
+      var WARNING = 10;
+
+      label.innerHTML = LIMIT;
+
+      comment.addEventListener('keyup', function(){
+        var remaining = LIMIT - this.value.length;//value:テキストボックスの値を参照する
+        label.innerHTML = remaining;
+        /*if (remaining < WARNING) {
+          label.className = 'warning';className:要素の class 属性の値の取得.warningで会った場合の処理 / 設定に用います。
+        }//🔟以下の場合ラベルのスタイルを変えてあげればいい
+        else {
+          label.className = '';
+        }https://developer.mozilla.org/ja/docs/Web/API/Element/className*/
+        //三項演算子
+        label.className = remaining < WARNING ? 'warning' : '';
+      });//変数 = 条件式 ? trueの時の値 : falseの時の値 ;
+
+    });
+
+
+</script>
+
+</body>
+</html>

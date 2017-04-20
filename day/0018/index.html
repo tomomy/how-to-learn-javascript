@@ -1,0 +1,187 @@
+<!doctype html>
+
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>How to Learn JavaScript</title>
+  <meta name="description" content="How to Learn JavaScript">
+  <meta name="author" content="Tomomi Suzuki">
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.js"></script>
+  <title>Numbers Game</title>
+  <style>
+    body {
+      background: #e0e0e0;
+      font-family: Arial, sans-serif;
+      text-align: center;
+      color: #0088cc;
+      font-size: 16px;
+    }
+    #scoreArea {
+      text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
+      margin: 30px auto;
+    }
+    #scoreText {
+      font-weight: bold;
+      font-size: 24px;
+    }
+    #startButton {
+      margin: 30px auto;
+      width: 180px;
+      border-radius: 5px;
+      box-shadow: 0 4px 0 #e91b0c;
+      background: #f44336;
+      color: #fff;
+      cursor: pointer;
+      padding: 7px;
+    }
+    #startButton:hover {
+      opacity: 0.8;
+    }
+    #startButton.pushed {
+      margin-top: 32px;
+      box-shadow: 0 2px 0 #e91b0c;
+    }
+    .btn {
+      position: relative;
+      display: inline-block;
+      width: 40px;
+      padding: 7px;
+      border-radius: 5px;
+      box-shadow: 0 4px 0 #0088cc;
+      color: #fff;
+      background: #00aaff;
+      cursor: pointer;
+      margin-bottom: 10px;
+    }
+    .btn.hidden:after {
+      content: '?';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 40px;
+      padding: 7px;
+      border-radius: 5px;
+      background: #00aaff;
+    }
+    .btn + .btn {
+      margin-left: 10px;
+    }
+    .btn.inactive {
+      opacity: 0.5;
+    }
+
+  </style>
+
+</head>
+
+<body>
+  <div id="scoreArea">Your Score: <span id="scoreText">0.0</span></div>
+  <div id="board">
+    <!-- <div class="btn">0</div>
+    <div class="btn">1</div><br>
+    <div class="btn">2</div>
+    <div class="btn">3</div> -->
+  </div>
+      <div id="startButton">START</div>
+
+  <script>
+    $(function (){
+      var size = 2;//2行2列
+      var currentNum = 0;//今押すべき数字
+      var startTime;//ボタンを押したときの時間保持
+      var timerId;//タイマーを回していく時
+
+      var board = document.getElementById('board');
+      var scoreText = document.getElementById('scoreText');
+      var startButton = document.getElementById('startButton');
+
+      initBoard();
+
+      startButton.addEventListener('click', function() {
+        initBoard();
+        var btns = document.getElementsByClassName('btn');
+        for (var i = 0; i < btns.length; i++) {
+          btns[i].className = 'btn';
+        }
+        currentNum = 0;
+        startTime = Date.now();
+        if (timerId !== null) clearTimeout(timerId);
+        runTimer();
+      });
+      startButton.addEventListener('mousedown', function() {
+        this.className = 'pushed';
+      });
+      startButton.addEventListener('mouseup', function() {
+        this.className = '';
+      });
+
+      function runTimer(){
+        scoreText.innerHTML = ((Date.now() - startTime) / 1000).toFixed(2);
+        timerId = setTimeout(function() {
+          runTimer();
+        }, 10);
+      }//runTimer は再帰的にこの関数自身を実行していけばいいのですが、その前に scoreText.innerHTMLを更新してあげましょう。経過時間を表示したいので今の時間から startTime を引いてあげれば OK
+
+      //ボタンを作る
+      function createButton(num) {
+        var button;
+        button = document.createElement('div');
+        button.className = 'btn hidden';
+        button.innerHTML = num;
+        button.addEventListener('click', function() {
+          if ((this.innerHTML - 0) === currentNum) {
+            this.className = 'btn inactive';//最初は 0 なので var currentNum = 0; としてあげて、もしこちらの button の innerHTML の数字を見て、それがもし currentNum と同じだったら押せなくすれば良いので、this.className を inactive にしてあげればOK.なのでthis.className = 'btn inactive'; としてあげます。
+            //こちらで引っ張ってきた innerHTML で取得できる数字はあくまでも文字列であって、currentNum は数字なので厳密演算子を使うとうまく比較できないかと思います。こちらの this.innerHTMLの中に入っている数字を数値型に変換してあげましょう。数値演算をしてあげればいいので中身に影響を与えない - 0 とか * 1 とかしてあげれば OK
+            currentNum++;//それからcurrentNumを増やしていけば OK
+          }
+          if (currentNum === size * size) {
+            //game over
+            //alert('Clear!');
+            clearTimeout(timerId);
+          }
+        });
+        return button;
+      }
+
+      function initBoard() {
+        var buttons = [];
+
+        //clear child
+        while (board.firstChild) {
+          board.removeChild(board.firstChild);
+        }
+
+        //buttons
+        //0, 1, 2, 3 ボタン要素　引数で番号を与える
+        for (var i = 0; i < size * size; i++) {
+          buttons.push(createButton(i));
+        }
+        /*
+        buttons.push(createButton(0));
+        buttons.push(createButton(1));
+        buttons.push(createButton(2));
+        buttons.push(createButton(3));*/
+
+        //シャッフル
+        //boardに追加. buttons.splice という命令を使ってあげて buttons からランダムな位置の要素を取り出しつつ board に配置していきます
+        while (buttons.length) {
+          var button = buttons.splice(Math.floor(Math.random() * buttons.length), 1);
+          board.appendChild(button[0]);
+          if (buttons.length % size === 0) {
+            board.appendChild(document.createElement('br'));//途中で改行を入れたいのでその処理も書いていきましょう。buttons から取り出してくっつけて、そうすると buttons からどんどん要素が無くなってくるので buttons がなくなった時にこの処理を終了、という流れになっています。
+          }
+        }
+
+        /*
+        board.appendChild(buttons[0]);
+        board.appendChild(buttons[1]);
+        board.appendChild(buttons[2]);
+        board.appendChild(buttons[3]);*/
+      }
+    });
+
+  </script>
+
+</body>
+</html>

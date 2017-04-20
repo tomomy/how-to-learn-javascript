@@ -1,0 +1,177 @@
+<!doctype html>
+
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>How to Learn JavaScript</title>
+  <meta name="description" content="How to Learn JavaScript">
+  <meta name="author" content="Tomomi Suzuki">
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.js"></script>
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/semantic-ui/2.2.7/semantic.min.css">
+  <script src="https://cdn.jsdelivr.net/semantic-ui/2.2.7/semantic.min.js"></script>
+</head>
+
+<body>
+
+  <div class="ui stackable menu">
+    <div class="item">
+    </div>
+    <a class="item">Features</a>
+    <a class="item">Testimonials</a>
+    <a class="item">Sign-in</a>
+    <div class="right item">
+     <div class="ui icon input">
+       <input id="search" type="text" placeholder="Search...">
+       <i class="search icon"></i>
+     </div>
+   </div>
+ </div>
+
+ <h1 class="ui centered header">
+
+
+  <div id="textarea">
+    <textarea id="target" onkeyup="document.getElementById('number').value=this.value.length" >
+    </textarea>
+    <div id="result">fffe</div>
+
+    <button class="ui button" id="add">Add</button>
+    <ul id="list">
+      <li id="apple">apple</li>
+      <li id="orange">orange</li>
+      <li id="banana">banana</li>
+    </ul>
+
+    <div id="todo">
+    </div>
+  </div>
+</h1>
+<h2>
+  <p>テキストエリアの文字列の文字数は <input type="text" id="number" style="width:5em";> 文字です。</p>
+</h2>
+
+<script>
+  /*
+  やりたいこと
+  1 キーが押されたのを検知する
+  2 キーが押されたってことは文字の内容が変わった
+  3 文字の内容が変わったら、textareaの文字の情報を取る
+  4 文字の情報が手に入ったら、HTMLを更新
+
+
+
+  consolのところに置き換えて、クリックなしで表示されるようにする
+  */
+
+
+  $("#textarea").bind('keyup', () => {
+    var text = $("#target").val();
+    $("#result").text(text);
+  });
+
+  $(function() {
+    $("#add").click(function() {
+      var text = $("#target").val();
+      $("ul").append("<li>" + text + "</li>");
+    });
+
+
+    $("#textarea").bind('keyup', () => {
+      // $("#apple").css('color','red');
+      // $("#banana").css('color','red');
+      // $("#orange").css('color','red');
+
+      var text = $("#target").val();
+      if (text == 'apple') {
+        $("#apple").css('color','red');
+      }
+      if (text == 'banana') {
+        $("#banana").css('color','yellow');
+      }
+      if (text == 'orange') {
+        $("#orange").css('color','orange');
+      }
+
+      if (text =='apple') {
+        $("#apple").css('color','red');
+      } else {
+        $("#apple").css('color','black');
+      }
+
+      if (text =='banana') {
+        $("#banana").css('color','yellow');
+      } else {
+        $("#banana").css('color','black');
+      }
+
+      if (text =='orange') {
+        $("#orange").css('color','orange');
+      } else {
+        $("#orange").css('color','black');
+      }
+    })
+
+
+    $("#target").bind('keyup', () => {
+      var text = $('#target').val();
+      // var thisValueLength = $(this).val().length;
+
+      text = 'hello'
+      text = 'hello world'
+      var thisValueLength = $('#target').val().length;
+      console.log(text);
+    });
+    $("#number").css('color','red');
+
+  });
+
+
+
+
+  /*
+  $('textarea').bind('keydown keyup keypress change',function(){
+    var thisValueLength = $(this).val().length;
+    $('.count').html(thisValueLength);
+  })
+  */
+
+
+  // $("#search").keyup(function() {
+  //   var a = $("#search").val();
+  //   $("#result").text(a);
+  // });
+
+  // $("#search").keyup(function() {
+  //   var a = $(this).val();
+  //   $("#result").text(a);
+  // });
+
+
+  // $("#textarea").click(() => {
+  //   var text = $("#target").val();
+  //   $("#result").text(text);
+  // });
+
+
+
+
+
+
+
+  // function hoge(elm){
+  //   console.log('key up')
+    // var v, old = elm.value;
+    // return function(){
+    //   if(old != (v=elm.value)){
+    //     old = v;
+    //     str = $(this).val();
+    //     $("#textarea2 div").text(str);
+    //   }
+    // }
+  // }
+</script>
+
+</body>
+</html>

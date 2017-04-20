@@ -1,0 +1,82 @@
+<!doctype html>
+
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>How to Learn JavaScript</title>
+  <meta name="description" content="How to Learn JavaScript">
+  <meta name="author" content="Tomomi Suzuki">
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/semantic-ui/2.2.7/semantic.min.css">
+  <script src="https://cdn.jsdelivr.net/semantic-ui/2.2.7/semantic.min.js"></script>
+  <title>スクロール実験</title>
+  <style>
+
+  </style>
+
+</head>
+
+<body style="text-align: center;">
+  <h1>スクロール実験</h1>
+  <p>hello!</p>
+  <p>hello!</p>
+  <p>hello!</p>
+  <p>hello!</p>
+  <p>hello!</p>
+  <p>hello!</p>
+  <p>hello!</p>
+  <p>hello!</p>
+  <p>hello!</p>
+  <p>hello!</p>
+  <p>hello!</p>
+  <p>hello!</p>
+  <p>hello!</p>
+  <p>hello!</p>
+  <p>hello!</p>
+  <p>hello!</p>
+  <p>hello!</p>
+  <p>hello!</p>
+  <p>hello!</p>
+  <p>hello!</p>
+  <p>hello!</p>
+  <p>hello!</p>
+  <p>hello!</p>
+  <p>hello!</p>
+  <p>hello!</p>
+  <p>hello!</p>
+  <p>hello!</p>
+  <p>hello!</p>
+  <p>hello!</p>
+  <p>hello!</p>
+  <div id="back-to-top" style="position: fixed;right: 5px;bottom: 5px"><a href="#">↑</a></div>
+  <div id="pos" style="position: fixed;left: 5px;bottom: 5px"></div>
+
+  <script>
+//ロードしたらback-to-topを消す
+  $(function() {
+    $('back-to-top').hide;
+
+//スクロールが十分されたらback-to-topを表示、スクロールが戻ったら非表示(Window全体に対して)
+//ウィンドウがどれだけスクロールされたかを取る手法「this」（つまりwindow要素）がどれだけスクロールしたかは、「scrollTop()」で取る。60以上なら表示しなさい else　戻しなさい
+    $(window).scroll(function(){
+      $('#pos').text($(this).scrollTop());
+      if ($(this).scrollTop() > 60) {
+        $('back-to-top').fadeIn();
+      } else {
+        $('back-to-top').fadeOut();
+
+      }
+    });
+//back-to-topがクリックされたら上に戻る.bodyを一番上に持ってくる
+    $('#back-to-top a').click(function() {
+      $('body').animate({
+        scrollTop:0
+      }, 500);
+      return false;
+    })
+  });
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,146 @@
+<!doctype html>
+
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>How to Learn JavaScript</title>
+  <meta name="description" content="How to Learn JavaScript">
+  <meta name="author" content="Tomomi Suzuki">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.js"></script>
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/semantic-ui/2.2.7/semantic.min.css">
+  <script src="https://cdn.jsdelivr.net/semantic-ui/2.2.7/semantic.min.js"></script>
+
+  <title>Flash Cards</title>
+  <style>
+  body {
+    margin: 0;
+    background: #e0e0e0;
+    text-align: center;
+    font-family: Verdana, sans-serif;
+    color: #fff;
+  }
+  #btn {
+    width: 200px;
+    margin: 0 auto;
+    padding: 7px;
+    border-radius: 5px;
+    background: #00aaff;
+    box-shadow: 0 4px 0 #0088cc;
+    cursor: pointer;
+  }
+  #btn:hover {
+    opacity: 0.8;
+  }
+  #card {
+    margin:  60px auto 20px;
+    width: 400px;
+    height: 100px;
+    cursor: pointer;
+    font-size: 38px;
+    line-height: 100px;
+    perspective: 100px;
+    transform-style: preserve-3d;
+    transition: transform .8s;
+  }
+  #card-front, #card-back {
+    display: block;
+    width: 100%;
+    height: 100%;
+    border-radius: 5px;
+    position: absolute;
+    backface-visibility: hidden;
+  }
+  #card-front {
+    background: #fff;
+    color: #333;
+  }
+  #card-back {
+    background: #00aaff;
+    transform: rotateY(180deg);
+  }
+  .open {
+    transform: rotateY(180deg);
+  }
+
+  </style>
+</head>
+
+<body>
+  <div id="card">
+    <div id="card-front"></div>
+    <div id="card-back"></div>
+
+  </div>
+  <div id="btn">NEXT</div>
+
+  <script>
+  var words = [
+    {'en': 'read', 'ja': '読む'},
+    {'en': 'write', 'ja': '書く'},
+    {'en': 'eat', 'ja': '食べる'},
+    {'en': 'run', 'ja': '走る'},
+    {'en': 'walk', 'ja': '歩く'},
+  ];
+  //wordsという配列を用意してあげたいと思います。配列の中身なのですが、英語は en というキーで保持しつつ、日本語はこのようにjaというキーで保持したいと思います。
+
+  var card = document.getElementById('card')
+  var cardFront = document.getElementById('card-front')
+  var cardBack = document.getElementById('card-back')
+  var btn = document.getElementById('btn')
+
+  card.addEventListener('click',function(){
+    flip();
+  });//card 要素を取得してあげて、扱いやすいようにしてあげましょう。document.getElementById()でcard要素を取得してあげて、そのカードに対して EventListener をつけてあげましょう。clickしたときに次のことしなさい」と書いてあげればOK
+  btn.addEventListener('click',function(){
+    next();
+  });//btn を押したときに次のカードに行きたいので、そのあたりのイベントを書いてしまいましょう。
+  function next (){
+    if (card.className === 'open'){
+      card.addEventListener('transitionend', setCard);
+      flip();
+    }//カードがオープンされた状態で NEXTを押すと、いきなり答えが出てしまうので、オープンされている時はNEXTを押したらflipしてから次に行くようにしてみましょう。条件分岐を書いていけば OK かと思います。open されているかどうかは card.className が open かどうかで調べることができるので、これで OK でしょう。
+    //flip してから next にすると、一瞬次の問題の答えが見えてしまっているのが分かるかと思います。card のイベントを見てあげて、こちらのトランジションが終わったときにこちらの処理をする、としてあげれば OK かと思います。setCardという関数にする
+    else {
+      setCard();
+    }//card が openしていない場合は、普通に setCard()してあげれば良いので、これで OK かと思います。
+
+
+
+  }//function next(){...}として、関数を作っていってあげましょう。words の中から、ランダムに選んで cardFrontとcardBackに設定すれば良いので、cardFront.innerHTML が何々と書いていけば OK .ランダムの要素を引っ張ってこないといけないので…、では何番目にするかというのを乱数で引っ張ってくるようにしましょう。
+
+  function setCard() {
+
+
+  var num = Math.floor (Math.random() * words.length);
+    cardFront.innerHTML = words[num]['en'];
+    cardBack.innerHTML = words[num]['ja'];//word[num] のキーとしては英語のほうを表に出したいのでこのようにしてあげて、cardBack.innerHTML のほうは、['ja'] のほうをセットしてあげれば OK なのではないでしょうか。
+    card.removeEventListener('transitionend', setCard);//それから何回もイベントがアタッチされると困ってしまうので、こちらで card.removeEventListener() してあげると良いかと思います。
+
+  }
+
+  setCard();//ここまでできたら、最初のカードをセットするには next() としてあげれば良いので、これで OK かと思います。それからこちらの最初のカードをセットするのは、別に next() ではなくて setCard() で良いので、こうしてあげるとなお良いかと思います。
+
+  window.addEventListener('keyup', function(e){
+    //e.keyCode
+    //f:70
+    //n:78
+    //console.log(e.keyCode)
+    if(e.keyCode === 70) {
+      flip();
+    } else if (e.keyCode ===78) {
+      next();
+    }
+
+  });//今回こちらのひっくり返す動作は flip なので f キー、次にいく動作は next なので n キーを割り当てていきましょう。window自体にイベントを設定してあげれば OK かと思います。
+  //押したキーを調べるには、こちらの関数に引数を与えてあげて、このイベントオブジェクトを取得してあげます。
+
+
+  function flip(){
+    card.className = card.className === ''?'open':'';
+  }//今回カードをひっくり返すのは flip()という関数にまとめてあげたいと思います.とはいっても簡単で、どうするかというと…、card.className を変えればOK.条件としては、card.className がもし空文字だったら openにしなさい、そうでなかったら空文字に戻しなさい、と三項演算子で書いてあげましょう
+
+
+</script>
+</body>
+</html>

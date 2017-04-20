@@ -1,0 +1,122 @@
+<!doctype html>
+
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>How to Learn JavaScript</title>
+  <meta name="description" content="How to Learn JavaScript">
+  <meta name="author" content="Tomomi Suzuki">
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/semantic-ui/2.2.7/semantic.min.css">
+  <script src="https://cdn.jsdelivr.net/semantic-ui/2.2.7/semantic.min.js"></script>
+  <title>Interactive Art</title>
+
+</head>
+
+<body>
+  <canvas id="mycanvas" width="500" height="250">
+    Canvasに対応したブラウザを使ってください
+  </canvas>
+
+
+  <script>
+    $(function(){
+      var canvas;
+      var ctx;
+      var Ball;
+      var balls = [];
+
+
+      canvas = document.getElementById('mycanvas');
+//もし、その canvas が取得できなかったら処理を終了させたいので…、このあたりはほとんど決まり文句ですが、次のように書いていってあげてください。処理を止めるためには、「return false」としてあげればOK.もし上手くいったら、ctxを取得しておきたいので、canvas.getContext() としてあげましょう。今回は2dで良いので、このように書いていってあげます。今回乱数をよく使うので最大値と最小値を指定して、その間の乱数を返してくれる rand() という関数を先に作っておきましょう。0 から n のランダムな整数を返すには、Math.randam() ではなくて…、「Math.floor(Math.random() * (n + 1))」とすれば良いという公式があったので、それを使って、min-max の範囲でランダムな整数値を返してくれる式を作っていきましょう。min から始まれば良いので、min をまず足してあげて、最大値のほうから min の分を引いてあげれば OK
+      if (!canvas || !canvas.getContext) return false;
+      ctx = canvas.getContext('2d');
+
+      function rand(min, max) {
+        //0-n
+        //Math.floor(Math.random() * (n + 1))
+        //min-max
+        return min + Math.floor(Math.random() * (max - min + 1));
+      }
+
+      canvas.addEventListener('click', function(e) {
+        var x, y, r;
+        var rect;
+        // x = rand(100, 400);
+        // y = rand(100, 200);
+        rect = e.target.getBoundingClientRect();
+        x = e.clientX - rect.left;
+        y = e.clientY - rect.top;
+//クリックした位置にボールが出現するようにしてあげましょうこちらの引数にイベントオブジェクトを渡してあげると、クリックした位置はe.clientXとe.clientYで取得することができます。ここで取得できる座標なのですが、ブラウザのこの左上が起点になってしまいます。canvasの領域は、それより少しずれているので、canvasの左上が起点になるように調整してあげましょう。どうするかなのですが、「var rect;」と宣言してあげて、「rect = e.target.getBoundingClientRect();」としてあげると、canvasの領域を取得することができます。そこまでできたら、この rect の左上の座標をx,yから引いてあげれば良いので、rect.left を引く、rect.top を引く、としてあげれば OK
+
+        r = rand(0, 100) < 20 ? rand(50, 80) : rand(10, 35);
+
+//実は端っこのほうでクリックすると、このような変な挙動になる場合があります。これは何かというと、境界からの距離が円の半径より小さいところでクリックすると、そこで延々と跳ね返りの処理が繰り返されてしまうことに起因しています。では左端からやっていきたいのですが、まずクリックした位置、つまり x から r を引いてみて、canvas の外に出てしまう、つまり 0 より小さかったらxをrの位置までずらしてあげることにしましょう。r を算出したあとに判定していきたいので、このあたりで書いていきましょう。xからrを引いていて、左端からはみ出してしまった場合は、x を r に戻してあげます。右端なのですが、x にrを足してみて、widthより大きくなってしまった場合は、x の位置をwidthからrを引いたところまで戻してあげたいと思います。xにrを足してみて、横幅より大きくなってしまった場合には、x を canvas の width から r を引いたものに代えてあげましょう。
+        if (x - r < 0) x = r;
+        if (y - r < 0) y = r;
+        if (x + r > canvas.width) x = canvas.width - r;
+        if (y + r > canvas.height) y = canvas.height - r;
+
+        balls.push(new Ball(x, y, r));
+      })
+
+//今回、中心の xy 座標と半径を渡されたと仮定して、それをまずプロパティに設定していきます。色もプロパティで管理しておきたいので、colorというプロパティを作っておいてあげます。今回、hsla() を使っていきましょう。円を描画するためのメソッドを作っていってあげます。まずはctx.beginPath()してあげればOK.その後に、円周を書いていきたいので、arc() という命令を使ってあげて、中心の座標と半径、それから 0 度から360度までなので、Math.PI*2を使ってあげれば良い.あとは fillStyleをthis.colorに設定してあげて、ctx.closePath() とした後に、fill() してあげれば OK
+      Ball = function(x, y, r) {
+        this.x = x;
+        this.y = y;
+        this.r = r;
+        this.vx = rand(-10, 10);//x方向の速度
+        this.vy = rand(-10, 10);//ｙ方向の速度
+        this.color = 'hsla(' + rand(50, 100) + ', ' + rand(40, 80) + '%, ' + rand(50, 60) + '%, ' + Math.random() + ')';
+        this.draw = function() {
+          ctx.beginPath();
+          ctx.arc(this.x, this.y, this.r, 0, Math.PI*2);
+          ctx.fillStyle = this.color;
+          ctx.closePath();
+          ctx.fill();
+        }
+
+//this.x に this.vx を足し上げていってあげて、y 方向についても同じようにしてあげると上手く動いてくれるはずです。
+//次はボールが壁に当たったら跳ね返るようにしてあげましょう。半径を考慮しておきたいので、まず x 方向についてなのですが、x と r を足し合わせたものが canvas.width より大きくなる、もしくは this.x から this.r を引いたものが0より小さくなった場合と書いてあげましょう。その場合は、x方向の速度を安定させてあげれば良いので、このように書いてあげれば OK
+        this.move = function() {
+          if (this.x + this.r > canvas.width || this.x - this.r < 0) {
+            this.vx *= -1;
+          }
+          if (this.y + this.r > canvas.height || this.y - this.r < 0) {
+            this.vy *= -1;
+          }
+          this.x += this.vx;
+          this.y += this.vy;
+        }
+      }
+
+//x と y は rand(100,200)としてあげて、半径に関しては rand(10,50) としてあげましょう。
+      //var ball = new Ball(rand(100, 200), rand(100, 200), rand(10, 50));
+      //ball.draw();
+
+//この draw() と move() をどんどん呼んでいけば良いので、setTimeout() などを使ってアニメーションさせるようにしてあげましょう。canvas 全体を塗りつぶさないと前の円が残ったままになるので、全体を背景色で塗りつぶしてあげましょう。全体を塗りつぶすには、ctx.fillRect() をしてあげて、左上の 0,0からcanvasの幅いっぱい、高さいっぱいを塗りつぶしてあげれば OK ball.draw(); ball.move(); としてあげて、この処理を繰り返せば良いので「setTimeout(function() {...」に…、この関数自身なので update() としてあげて、では今回 30 ミリ秒ごとに呼び出してみましょう。
+      function update() {
+        var i;
+        ctx.fillStyle = '#ecf0f1';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        for (i = 0; i < balls.length; i++) {
+          balls[i].draw();
+          balls[i].move();
+        }
+
+
+        setTimeout(function() {
+          update();
+        }, 30);
+      }
+
+      update();//一回実行しないといけないので、update() とする
+
+    });
+
+  </script>
+
+</body>
+</html>

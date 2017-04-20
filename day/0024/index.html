@@ -1,0 +1,68 @@
+<!doctype html>
+
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>How to Learn JavaScript</title>
+  <meta name="description" content="How to Learn JavaScript">
+  <meta name="author" content="Tomomi Suzuki">
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/semantic-ui/2.2.7/semantic.min.css">
+  <script src="https://cdn.jsdelivr.net/semantic-ui/2.2.7/semantic.min.js"></script>
+  <title>キャラ診断</title>
+  <style>
+    body {
+      text-align: center;
+    }
+  </style>
+
+
+</head>
+
+<body>
+  <h1>キャラ診断</h1>
+  <p><input type="text" id="name" value=""></p>
+  <p><input type="button" id="getResult" value="診断!"></p>
+  <h2>診断結果</h2>
+  <p id="result">こちらに結果が表示されます。</p>
+  <div id="tweet"></div>
+
+  <script>
+//診断ボタンを押されたら＞
+  $(function() {
+    $("#getResult").click(function() {
+//名前の取得　入力フォームのnameを使って値valを取る
+    var name = $("#name").val();
+    //console.log(name);
+
+//名前が入力されない場合はアラートする if内で処理を止めるためreturn
+    if (name === "") {
+      alert("名前を入力してください!");
+      return;
+    }
+
+    //タイプの生成　あなたは〜です
+    var types = ["勇者", "魔法使い", "戦士", "遊び人", "スーパースター"];
+//0-nの乱数　0-4を取ればいい Math.floor(Math.random() * (n+1))
+    var type = types[Math.floor(Math.random() * types.length)];
+
+//キャラクター生成 タイプの前に賢い・かっこいい等の形容詞をつけて、面白みを
+    var characters = ["賢い", "勇ましい", "可愛い", "情けない", "情けない"];
+//0-nの乱数　0-4を取ればいい Math.floor(Math.random() * (n+1))
+    var character = characters[Math.floor(Math.random() * characters.length)];
+
+//結果の表示　
+    var result = name + "さんは 「" + character + type + "」タイプです!";
+    $("#result").text(result);
+
+//ツイートリンク表示  _blank:新しいタブで表示してくれる
+//https://dev.twitter.com/web/tweet-button/web-intent
+    var tweetLink = "<a href='https://twitter.com/intent/tweet?text=" + encodeURIComponent(result) + "&hashtags=dotinstall' target='_blank'>ツイートする</a>";
+    $("#tweet").html(tweetLink);
+    });
+  });
+  </script>
+
+</body>
+</html>

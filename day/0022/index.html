@@ -1,0 +1,214 @@
+<!doctype html>
+
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>How to Learn JavaScript</title>
+  <meta name="description" content="How to Learn JavaScript">
+  <meta name="author" content="Tomomi Suzuki">
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/semantic-ui/2.2.7/semantic.min.css">
+  <script src="https://cdn.jsdelivr.net/semantic-ui/2.2.7/semantic.min.js"></script>
+  <title>Slideshow</title>
+  <link rel="stylesheet" href="css/font-awesome.min.css">
+
+  <style>
+    .container {
+      width: 300px;
+      margin: 0 auto;
+    }
+
+    #prev, #next {
+      cursor: pointer;
+      font-size: 42px;
+      color: #bbb;
+      position: absolute;
+      top: 90px;
+    }
+    .main {
+      position: relative;
+    }
+    #prev {
+      left: -60px;
+    }
+    #next {
+      right: -60px;
+    }
+
+
+    nav ul {
+      padding: 0;
+      margin: 0;
+      list-style: none;
+    }
+    nav li {
+      float: left;
+      cursor: pointer;
+      opacity: 0.6;
+    }
+    nav li + li {
+      margin-left: 6px;
+    }
+    nav li:hover {
+      opacity: 1;
+    }
+    nav li.current {
+      opacity: 1;
+    }
+    #play, #pause {
+      display: inline-block;
+      width: 70px;
+      line-height: 30px;
+      text-align: center;
+      font-size: 12px;
+      color: #aaa;
+      border: 1px solid #aaa;
+      border-radius: 3px;
+      cursor: pointer;
+      float: right;
+    }
+    #play.hidden, #pause.hidden {
+      display: none;
+    }
+    nav img {
+      width: 45px;
+      height: 30px;
+    }
+  </style>
+
+</head>
+
+<body>
+  <div class="container">
+    <div class="main">
+      <i class="fa fa-chevron-circle-left" aria-hidden="true" id="prev"></i>
+      <img src="img/food0.jpg" width="300" height="200" id="target">
+      <i class="fa fa-chevron-circle-right" aria-hidden="true" id="next"></i>
+    </div>
+    <nav>
+      <ul id="thumbnails">
+        <!-- <li class="current"><img src="img/foood0.jpg" width="45" height="30"></li> -->
+        <!-- <li><img src="img/foood1.jpg" width="45" height="30"></li> -->
+        <!-- <li><img src="img/foood2.jpg" width="45" height="30"></li> -->
+        <!-- <li><img src="img/foood3.jpg" width="45" height="30"></li> -->
+      </ul>
+      <div id="play">
+        <i class="fa fa-play" aria-hidden="true"></i>再生
+      </div>
+      <div id="pause" class="hidden">
+        <i class="fa fa-pause" aria-hidden="true"></i>停止
+      </div>
+    </nav>
+  </div>
+
+  <script>
+    $(function() {
+      var files = [
+        'img/food0.jpg',
+        'img/food1.jpg',
+        'img/food2.jpg',
+        'img/food3.jpg',
+      ];
+
+      var currentNum = 0;
+      var prev = document.getElementById('prev');
+      var next = document.getElementById('next');
+      var target = document.getElementById('target');
+      var thumbnails = document.getElementById('thumbnails');
+      var play = document.getElementById('play');
+      var pause = document.getElementById('pause');
+
+//clearTimeout() の引数は setTimeout() で返ってくるタイマー id なので、まずそれを受けてあげる変数を上で宣言しておきましょう。
+      var timer;
+
+//何をするかなのですが、files 分のループを回してあげたいので、まずはループ用の変数を宣言してあげましょう。 var i; としつつ、for 文を書いていってあげます。files 分のループなので、i = 0; としつつ、 i が files.length より小さい間、いろいろな処理をしなさい、と書いてあげれば OK 次に li 要素と img 要素を作っていくので、まずは変数で宣言してあげて、こちらの方で要素を作っていきましょう。そのあとに imgのsrc属性にファイル名をセットしたいので、img.src = files[i] と表現してあげれば OK でしょう。あとは要素を子要素として追加していけばいいので、li の子要素として、img を追加してあげましょう。ul の方にも li を追加していきたいので、それをthumbnailsとしたあとに、li を appendChild(li)で追加してあげます。
+      function createthumbnails() {
+        var i;
+        var li;
+        var img;
+        for (i = 0; i < files.length; i++) {
+          li = document.createElement('li');
+
+
+          li.setAttribute('data-index', i);
+
+//下の小さな画像をクリックした時の動作も書いていきましょう。では li に対してイベントを設定していきます。li.addEventListener としつつ…、クリックした時に何らかの処理を行う、と書いていってあげましょう。何をしたいかというと、target の src 属性を設定してあげればいいですね。なので target.src = としつつ、設定する中身は クリックした li の子要素の img 要素、最初の子要素なので this.children[0] とすれば OK でしょう。
+          li.addEventListener('click', function() {
+            target.src = this.children[0].src;
+
+            thumbnails.children[currentNum].className = '';
+            currentNum = this.dataset.index;
+            this.className = 'current';
+
+          });
+          img = document.createElement('img');
+          img.src = files[i];
+          li.appendChild(img);
+          thumbnails.appendChild(li);
+
+        }
+      }
+
+//再生機能の実装。setTimeoutで書いていきたいので、function playSlideshow()という関数を作る。setTimeout を使って 1.5秒後になんらかの処理を行う、とまずは書いていきましょう。setTimeout(function(){…としてあげて、こちらに1.5秒のミリ秒で表現した 1500 を書いてあげます。next.click(); とすれば同じ処理を実行してくれるので覚えておきましょう。そのあとに次の処理に移りたいので、この playSlideshow() の関数自体を実行してあげれば OK
+//こちらの playSlideshow(); を play ボタンを押した時に実行してあげればいいので、まずは play ボタンの要素の取得をしておきましょう。var play = としつつ、document.getElementById('play'); で要素を取得していきます。
+//setTimeout()の返り値をtimerに代入してあげればいいので、timer = setTimeout(function() {…のようにしてあげて、あとは timer を clearTimeout() に設定してあげましょう。
+      function playSlideshow() {
+        timer = setTimeout(function() {
+          next.click();
+          playSlideshow();
+        }, 1500);
+      }
+
+      createthumbnails();
+
+//一番左の画像は最初から色を濃くしておきたいので、そちらを先にやっていきましょう。一番左が 0 番目なのですが、currentNum が今 0 なので、thumbnails の children の currentNum 番目、と表現すれば OK そちらの className を current にしてあげれば 0 番目（一番左）の画像が濃くなってくれるはずです。
+      thumbnails.children[currentNum].className = 'current;'
+
+//クリックした時に次の処理を書きなさい、としてあげれば OK です。currentNum から 1 引けばいいのですが、今回の画像は 0 から 3 までなので、0 より小さくなったら 3 に戻してあげないといけないですね。では currentNum が 0 より小さい時は、currentNum を 3 に設定してあげましょう。このあたりの数値が、画像ファイルが減ったり増えたりした時にいちいち書き換えなくてもいいようにしておきましょう。配列の要素数を使って書き換えればいいので、今回 files.length を使っていきましょう。今は4つのファイルがあるので、files.length で 3 を表現するには files.length - 1 としてあげれば OK です。
+//こちらの完成版にあるように「次へ」「前へ」のボタンのクリックに合わせて current クラスを移動させてあげましょう。current クラスを入れ替えたいので、まずは今ついている current クラスを消していきましょう。今どこについているかというと…、thumbnails の children の currentNum 番目についているはずなので、そこの className を空にしてあげれば OK このあとに currentNum がいろいろ操作されるので、そのあとにまた currentNum 番目に current をつけてあげればいいでしょう。
+      prev.addEventListener('click', function() {
+        thumbnails.children[currentNum].className = '';
+        currentNum--;
+        if (currentNum < 0) {
+          currentNum = files.length - 1;
+        }
+        target.src = files[currentNum];
+        thumbnails.children[currentNum].className = 'current';
+      });
+
+//こちらは3を超えたら0にしたいので、このように変えてあげれば OK こちらを next としてあげつつ、currentNum は 1 ずつ増やしていってあげましょう。
+      next.addEventListener('click', function() {
+        thumbnails.children[currentNum].className = '';
+        currentNum++;
+        if (currentNum > files.length - 1) {
+          currentNum = 0;
+        }
+        target.src = files[currentNum];
+        thumbnails.children[currentNum].className = 'current';
+
+
+      });
+
+//play ボタンを押すと…こうですね、ちゃんと 1.5 秒ごとに切り替わっているのがわかるかと思います
+//play をクリックした時ですが、この要素（this）の classNameをhiddenにして非表示にしてあげつつ、pause の方はhiddenを外したいのでclassNameを空文字にしてあげれば OK
+      play.addEventListener('click', function() {
+        playSlideshow();
+        this.className = 'hidden';
+        pause.className = '';
+      });
+
+//setTimeout()で回りはじめたタイマーを止めたいので、clearTimeout() としてあげたいですね。こちらで clearTimeout(timer); としてあげます。
+      pause.addEventListener('click', function() {
+        clearTimeout(timer);
+        this.className = 'hidden';
+        play.className = '';
+      });
+
+    });
+
+
+  </script>
+
+</body>
+</html>

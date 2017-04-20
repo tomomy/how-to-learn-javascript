@@ -1,0 +1,103 @@
+<!doctype html>
+
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>How to Learn JavaScript</title>
+  <meta name="description" content="How to Learn JavaScript">
+  <meta name="author" content="Tomomi Suzuki">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.js"></script>
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/semantic-ui/2.2.7/semantic.min.css">
+  <script src="https://cdn.jsdelivr.net/semantic-ui/2.2.7/semantic.min.js"></script>
+
+  <title>Stop at 00:05!</title>
+  <style>
+    body {
+      background: #e0e0e0;
+      text-align: center;
+      font-size: 16px;
+      font-family: Arial, sans-serif;
+    }
+    #result {
+      font-weight: bold;
+      font-size: 32px;
+      margin: 60px auto;
+      color: #00aaff;
+      text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
+    }
+    #btn {
+      margin: 0 auto;
+      width: 200px;
+      padding: 7px;
+      color: #fff;
+      border-radius: 5px;
+      background: #00aaff;
+      box-shadow: 0 4px 0 #0088cc;
+      cursor: pointer;
+    }
+    #btn:hover {
+      opacity: 0.8;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="result"></div>
+  <div id="btn">START</div>
+
+  <script>
+  $(function(){
+    var isStarted = false;
+    //Windowを開けた時は、まだfalseの状態。ボタンを押して、動作を開始するときにtrueになる
+    var startTime;
+    //ボタンを押下したとき、現在の時間を保持
+    var diff;
+    //どの位の間隔でボタンを押したのか、時間を保持するためのもの
+    var msg = 'Stop at 00:05!';
+
+    var result = document.getElementById('result');
+    var btn = document.getElementById('btn');
+
+    result.innerHTML = msg;
+
+    btn.addEventListener('click',function(){
+      if(!isStarted){
+        //!は反対の意味(trueになる）ゲームが始まった場合
+        //上で、trueになったのは一度だけなので、下で再度設定が必要
+        isStarted = true;
+        this.innerHTML = 'STOP';
+        //時間を取得する
+        startTime = Date.now();
+        //スタートした時〜現在の時間
+         result.innerHTML = msg; //スタートボタン押下時も表示
+       } else {
+          //ボタンが押されたときは、ストップされた状態になっている
+          isStarted = false;
+          this.innerHTML = 'START';
+          //judge, show result
+          diff = (Date.now() - startTime) / 1000 - 5;
+          //現在の時間ースタートした時間。m秒になっているので、秒にするために、1000で割る。5秒との差を知りたいので、-5
+          //console.log(diff);
+
+                    //0.1秒位の誤差は許す
+          if (diff>= -0.1 && diff <= 0.1) {
+            //-0.1 > diff > 0.1と同じ
+            result.innerHTML = 'Perfect!';
+          } else if (diff > 0) {
+            result.innerHTML = 'You are' + difftoFixed(3) + 'seconds late!';
+            //
+          } else {
+            result.innerHTML = 'You are' + Math.abs(diff).toFixed(3) + 'seconds fast!';
+          } //−の状態なので、絶対値を表示する。３の位で四捨五入
+        }
+
+      });
+  });
+
+
+
+</script>
+
+</body>
+</html>

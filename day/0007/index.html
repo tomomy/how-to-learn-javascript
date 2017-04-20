@@ -1,0 +1,87 @@
+<!doctype html>
+
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>How to Learn JavaScript</title>
+  <meta name="description" content="How to Learn JavaScript">
+  <meta name="author" content="Tomomi Suzuki">
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.js"></script>
+  <title>おみくじをつくる</title>
+  <style>
+  body {
+    background: #e0e0e0;
+    text-align: center;
+    font-size: 16px;
+    color: #fff;
+    font-family: Arial, sans-serif;
+  }
+   #result {
+    margin: 30px auto;
+    width: 180px;
+    height: 180px;
+    border-radius: 50%;
+    line-height: 180px;
+    font-size: 48px;
+    font-weight: bold;
+    background: #f44336;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3)
+   }
+   #btn {
+    margin: 0 auto;
+    width: 200px;
+    padding: 5px;
+    border-radius: 5px;
+    background: #00aaff;
+    box-shadow: 0 4px 0 #0088cc;
+    cursor: pointer;
+   }
+   #btn:hover {
+    opacity: 0.8;
+   }
+   #btn.pushed{
+    margin-top: 32px;
+    box-shadow: 0 2px 0 #0088cc;
+   }
+  </style>
+</head>
+
+<body>
+<div id="result">?</div>
+<div id="btn">あなたの運勢は？</div>
+
+
+  <script>
+       /*
+       コメント
+       */
+       //コメント
+  var msg = "hello world!";
+  console.log(msg);
+   (function(){
+    document.getElementById('btn').addEventListener('click',function(){
+      //乱数の生成　0 - n
+      //Math.floor(Math.random() * (n + 1))
+      //0 - 3
+      //Math.floor(Math.random() * 4) ←3 + 1 = 4
+      var results = ['大吉','小吉','中吉','凶','吉']
+      var result = Math.floor(Math.random() * results.length);
+         // * 4 だと４つで数を増やした時にエラーが出るので個数を表すlengthを使う
+      //document.getElementById('result').innerHTML = 'hit';　←？からhitになる
+      document.getElementById('result').innerHTML =results[result];
+         //resultsの中のresult番目を表示
+    });
+    document.getElementById('btn').addEventListener('mousedown',function(){
+      this.className = 'pushed';
+    });
+    document.getElementById('btn').addEventListener('mouseup',function(){
+      this.className = '';
+    });
+  })();
+
+  </script>
+
+
+</body>
+</html>

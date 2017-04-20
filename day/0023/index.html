@@ -1,0 +1,196 @@
+<!doctype html>
+
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>How to Learn JavaScript</title>
+  <meta name="description" content="How to Learn JavaScript">
+  <meta name="author" content="Tomomi Suzuki">
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/semantic-ui/2.2.7/semantic.min.css">
+  <script src="https://cdn.jsdelivr.net/semantic-ui/2.2.7/semantic.min.js"></script>
+  <title>jQueryの練習</title>
+  <style>
+    .myStyle {
+      border:5px solid green;
+      font-size: 48px;
+    }
+  </style>
+</head>
+
+<body>
+  <p>jQueryの練習</p>
+  <!-- <ul id="main"> -->
+    <!-- <li>0</li> -->
+    <!-- <li class="item">1</li> -->
+    <!-- <li class="item">2</li> -->
+    <!-- <li> -->
+      <!-- 3 -->
+      <!-- <ul id="sub"> -->
+        <!-- <li>3-0</li> -->
+        <!-- <li>3-1</li> -->
+        <!-- <li class="item">3-2</li> -->
+        <!-- <li class="item">3-3</li> -->
+        <!-- <li>3-4</li> -->
+      <!-- </ul> -->
+    <!-- </li> -->
+  <!-- </ul> -->
+
+  <!-- <a href="http://google.com" data-sitename="google">Google</a> -->
+  <!-- <p><a href="http://yahoo.co.jp">Yahoo!</p> -->
+  <!-- <p><a href="http://dotinstall.com">Dotinstall</p> -->
+  <!-- <input type="text" value="hello"> -->
+  <!-- <ul> -->
+    <!-- <li>0</li> -->
+    <!-- <li>1</li> -->
+    <!-- <li>2</li> -->
+  <!-- </ul> -->
+  <!-- <div id="box" style="width: 100px;height: 100px;background: red;"></div> -->
+  <!-- <input type="text" id="name"> -->
+  <!-- <select id="members" name="members"> -->
+    <!-- <option>taguchi</option> -->
+    <!-- <option>fkoji</option> -->
+    <!-- <option>dotinstall</option> -->
+  <!-- </select> -->
+  <!-- <button>Add!</button> -->
+
+  <script>
+//documentが読み込まれたら次の処理をしなさい、という意味になります。省略すると、$(function)
+    //$(document).ready(function() {
+      $(function() {
+//セレクタ: HTML文書がブラウザに読み込まれるとDocumentObjectModel（DOM）が作られるのですが、それを指定するための記法 $('p')
+//メソッド:メソッドはその処理対象に対して行いたい「処理」.css('color', 'red');
+//メソッドチェーン:繋げて書くこと .hide('slow')
+        // $('p').css('color', 'red').hide('slow');
+//セレクタの指定要素:HTML要素の場合はそのままpやh1、ul
+//id要素:#main
+//class: .item
+//>:直下の子要素 main 直下の item だけ指定したい場合 $("#main > .item")
+//空白:それ以下の要素 $("#main .item")
+//,:複数の要素 $("p, .item")
+//+:隣接する要素 $(".item + .item") itemの隣にあるitem要素
+//: フィルタ #sub の子要素にあるli要素のうち、好きなものをフィルタ。eq(2)」とすると、liの添え字は0から始まるので0番目、1番目、2番目で 3-2 が選択される.フィルタは「:」と書いた後に好きなものを使うのですが、例えば equal（イコール）という意味で「eq」を使える。
+//:eq()
+//:gt(), lt() greater:1より大きいという意味なので、これが0、1なので、3-2以降が選択される。less than:小さい
+//:even, :odd 偶数,奇数
+//:contains() 要素の中身に何があるかを示す
+//:first, :last 1番上,1番下
+
+      //$("#sub").css('color', 'red');
+      //$("#main .item").css('color', 'red');
+      //$("p, .item").css('color', 'red');
+      //$(".item + .item").css('color', 'red');
+      //$("#sub > li:eq(2)").css('color', 'red');
+      //$("#sub > li:gt(1)").css('color', 'red');
+      //$("#sub > li:odd").css('color', 'red');
+      //$("#sub > li:contains('4')").css('color', 'red');
+
+//メソッドを使ったDOM要素の指定
+//parent()、children(): ある要素の親要素、子要素を指定 subの親要素は直前の3から始まる;子要素(3-0)から始まる
+//next()、prev(): ある要素の前、後を指定
+//siblings():3-2要素と同列にあるすべての要素を siblings() で指定できる。
+      //$("#sub").parent().css('color', 'red');
+      //$("#sub > li:eq(2)").next().css('color', 'red');
+      //$("#sub > li:eq(2)").siblings().css('color', 'red');
+
+//属性セレクタ:HTMLに含まれる属性でもってセレクタを指定していく.a 要素の href 属性に「google」が含まれるもの、といった指定
+//= 等しい
+//!= 等しくない
+//*= 何々を含む dotinstallが含まれる
+//^= 先頭から始まる
+//$= 終わり
+      //$('a[href="http://google.com"]').css('background', 'red')
+      //$('a[href!="http://google.com"]').css('background', 'red')
+      //$('a[href*="dotinstall"]').css('background', 'red')
+      //$('a[href$="jp"]').css('background', 'red')
+
+//consoleで値を取る
+      // $('p').css('color', 'red').css('background', 'blue');
+      // console.log($('p').css('color'));
+
+//addClass removeClass
+      //$('p').addClass('myStyle');
+
+//attribute HTML の属性の値を取得したり変更 今設定されているhref属性の値を知りたい場合は次のように書いていけば OK.属性を変えたい場合：直ぐ次にリンク先をつけるだけ
+      /*console.log($('a').attr('href'));
+      $('a').attr('href', 'http://google.co.jp');*/
+//data 例えば HTML の属性にはないのですが、アプリケーションで使うので、何らかのカスタム属性を付けておきたい場合 data-… でそうした属性を付ける
+      //console.log($('a').data('sitename'));
+
+//text書き換え
+//html
+//value フォーム部品
+//remove, empty 空にする；消す
+      //$('p').text('just changed');
+      //$('p').html('<a href="">click me!</a>');
+      //console.log($('input').val());
+      //$('input').val('hello, agein!');
+      //$('p').empty();
+
+//before, after ->insertBefore, insertAfter語順を変える
+//prepend, append 子要素の先頭;最後に追加
+//新しく要素を追加するにあたっては、li 要素を追加.1の前に追加 prependTo, appendTo
+      //var li = $('<li>').text('just added');
+      //$('ul > li:eq(1)').before(li);
+      // /li.insertBefore($('ul>li:eq(1)'));
+      //$('ul').prepend(li);ul子要素の先頭に追加
+      //li.appendTo($('ul'));
+//hide, show: .hide('slow');(800):0.8秒
+//fadeOut, fadeIn
+//toggle 今表示されていたら消す;消えていたら表示する
+      //$('#box').hide(800);
+      //$('#box').fadeOut(800);
+      //$('#box').toggle(800);
+      /*$('#box').fadeOut(800, function() {
+        alert("gone!");
+      });この数値の後に関数を取る.コールバック関数と呼ばれたりしますが、第 2 引数に function を取る*/
+//click
+//mouseover, mouseout, mousemove
+      /*$('#box').click(function() {
+        alert("hi");
+      });
+      $('#box')
+        .mouseover(function() {
+          $(this).css('background', 'green');
+      })//イベントの対象になっている物の背景色を変える。その対象をthisで表せる
+        .mouseout(function() {
+          $(this).css('background', 'red');
+      })
+        .mouseout(function(e) {
+          $(this).text(e.pageX);
+      })マウスが動いている間に何らかの処理.マウスの x 座標を表示.イベントの情報を取りたいので、function に引数eを渡してあげます.eはイベントオブジェクトと呼ばれるものなのですが、API Documentation の Events の Event Object がある.pageXというマウス座標を取得する命令を使っていきましょう。*/
+
+//focus, blur: focusが外れた時
+//change: $('#members')値が変わった時に何かをしたい場合
+      /*$('#name')
+        .focus(function() {
+          $(this).css('background', 'red');
+      })
+        .blur(function() {
+          $(this).css('background', 'white');
+      });
+      $('#members').change(function() {
+        alert('changed!');
+      })*/
+
+      $('button').click(function() {
+        var p = $('<p>').text('vanish!').addClass('vanish');
+        $(this).before(p);
+      });//buttonを押すたびに、この要素の前にp要素が動的に作られていく
+//click イベントはドキュメントが読み込まれた時に設定するのですが、読み込まれた時点ではvanishクラスがついた要素は存在していません。button のクリックイベントで動的に作られるので、読み込まれた時に存在していない要素に対してイベントをつけるにはonを使う。vanish の親要素$('body')をまずは指定。「.on」と指定してあげて、イベントの種類（この場合はclick）を設定。その後にclick対象となる '.vanish' を指定してあげて、最後に関数を指定
+      $('.vanish').click(function() {
+        $(this).remove();
+      });
+      $('body').on('click', '.vanish', function() {
+        $(this).remove();
+      });
+//Asynchronous JavaScript + XML:サーバーと通信+ページを書き換え
+
+
+
+    });
+  </script>
+
+</body>
+</html>

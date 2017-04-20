@@ -1,0 +1,124 @@
+<!doctype html>
+
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>How to Learn JavaScript</title>
+  <meta name="description" content="How to Learn JavaScript">
+  <meta name="author" content="Tomomi Suzuki">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.js"></script>
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/semantic-ui/2.2.7/semantic.min.css">
+  <script src="https://cdn.jsdelivr.net/semantic-ui/2.2.7/semantic.min.js"></script>
+
+  <title>割り勘電卓</title>
+  <style>
+    body {
+      font-size: 16px;
+      text-align: center;
+      font-family: Arial, sans-serif;
+    }
+    h1 {
+      font-size: 24px;
+    }
+    input[type="text"] {
+        padding: 7px;
+        border: 1px solid #ddd;
+        border-radius: 3px;
+        width: 100px
+        font-weight: bold;
+        font-size: 18px;
+        text-align: right;
+    }
+    #btn {
+      margin: 30px auto;
+      width: 180px;
+      border-radius: 5px;
+      box-shadow: 0 4px 0 #e91b0c;
+      background:  #f44336;
+      color: #fff;
+      cursor: pointer;
+      padding: 7px;
+    }
+    #btn:hover {
+      opacity: 0.8;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="ui stackable menu">
+  <div class="item">
+  </div>
+  <a class="item">Features</a>
+  <a class="item">Testimonials</a>
+  <a class="item">Sign-in</a>
+  <div class="right item">
+   <div class="ui icon input">
+   <input type="text" placeholder="Search...">
+      <i class="search icon"></i>
+    </div>
+  </div>
+  </div>
+
+  <h1>割り勘電卓</h1>
+  <p>金額 <input type="text" id="price" value="0"></p>
+  <p>人数 <input type="text" id="num" value="0"></p>
+  <div id="btn">計算する</div>
+  <p id="result"></p>
+  //結果を表示するためのパラグラフ
+
+<script>
+  (function (){
+    var priceForm = document.getElementById('price');
+    var numForm = document.getElementById('num');
+    var btn = document.getElementById('btn');
+    var result = document.getElementById('result');
+
+    priceForm.addEventListener('click', function(){
+        this.select();
+        //数値を選択できるようにする。selectイベントを実行する。selectイベントは通常、テキストエリアの文字列を選択状態にしたり、選択範囲を変更した際に呼び出される。
+    });
+    numForm.addEventListener('click', function(){
+        this.select();
+    });
+
+    btn.addEventListener('click', function(){
+        var price = priceForm.value;
+        var num = numForm.value; //エラーを確認するために、フォームに入力された数字を取得
+        var x1, x2, y1, y2;
+        var unit = 100; //
+
+        if (price.match(/^[1-9][0-9]*$/) && num.match(/^[1-9][0-9]*$/)) {
+          //ok
+          //result.innerHTML =　'OK!';
+          if (price % num === 0) { //割り切れた場合
+              result.innerHTML = '一人' + (price / num) + '円ちょうどです！';
+          } else {
+            //result.innerHTML = 'something';
+            x1 = Math.floor(price / num / unit) * unit;
+            //Math.floor小数点切り捨て
+            y1 = price - (x1 * num);
+            x2 = Math.ceil(price / num / unit) * unit;
+            //小数点切り上げ
+            y2 = Math.abs(price - (x2 * num));//絶対値
+
+
+            result.innerHTML =
+            '一人' + x1 + '円だと' + y1 + '円足りません。<br>' +
+            '一人' + x2 + '円だと' + y2 + '円余ります。';
+
+          }
+
+        } else {
+          //error
+          result.innerHTML = '入力された値に誤りがあります。';
+        }
+
+    });//正の整数かどうかチェック。[1の位][10の位]
+
+  })();
+</script>
+</body>
+</html>
